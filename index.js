@@ -3,9 +3,11 @@ const path = require("path");
 
 const { connectToMongoDB } = require("./connect");
 
-const urlRoute = require("./routes/url");
-const URL = require("./models/url")
 
+const urlRoute = require("./routes/url");
+const staticRoute = require("./routes/staticRouter")
+
+const URL = require("./models/url")
 
 const app = express();
 const PORT = 8001;
@@ -21,16 +23,11 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/url", urlRoute);
 
-app.get("/home", (req, res) => {
-  return res.render("home");
-});
+app.use("/home", urlRoute);
+app.use("/", staticRoute);
 
-app.get("/", (req, res) => {
-  return res.send("Hello from Page!");
-});
-app.get("/:shortId", async (req, res) => {
+app.get("/home/:shortId", async (req, res) => {
   const shortId = req.params.shortId;
   const entry = await URL.findOneAndUpdate(
     {
